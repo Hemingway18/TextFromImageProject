@@ -1,18 +1,19 @@
-from flask import Flask, render_template, redirect, request, url_for
-from flask_sqlalchemy import SQLAlchemy
+import os
+from flask import Flask, render_template, redirect, request, flash, url_for
+from werkzeug.utils import secure_filename
+import Text
+
+UPLOAD_FOLDER = 'C:\\Users\\georg\\PycharmProjects\\Flask\\templates\\Images'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+app.secret_key = os.urandom(24)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True, nullable=False)
-    picture = db.Column(db.BLOB, nullable=False)
-
-    def __repr__(self):
-        return '<User %r>' % self.id
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route("/about")
@@ -27,18 +28,24 @@ def faq():
 
 @app.route("/", methods=["POST", "GET"])
 def index():
-    if request.method == "POST":
-        picture = request.form.get('picture')
-        user = User(picture=picture)
-        db.session.add(user)
-        db.session.commit()
-        return redirect("/")
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('Не могу прочитать файл')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('Нет выбранного файла')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            a = Text.get_text(f'C:\\Users\\georg\\PycharmProjects\\Flask\\templates\\Images\\{filename}')
+            print(a)
+            return redirect(url_for('about', name=filename))
+        return redirect("/faq")
     else:
         return render_template("index.html")
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-

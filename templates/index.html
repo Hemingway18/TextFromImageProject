@@ -6,12 +6,12 @@
 
 {%block body%}
 <div class="text-block" style="border:10px solid #555; border-radius:10px; width: 500px; text-align:center;margin: 200px 500px">
-    <form enctype="multipart/form-data" method="post">
+    <form enctype="multipart/form-data" method='post' action="{{ url_for('index') }}">
         <p>
             <font face="consolas">Выберете изображение, текст с которого желаете получить</font>
         </p>
         <p>
-            <input name="picture" type="file" id="picture" multiple accept="image/*,image/jpeg">
+            <input type='file' name='file'>
             <input type="submit" value="Отправить">
         </p>
     </form>

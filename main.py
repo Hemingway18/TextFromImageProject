@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, redirect, request, flash, url_for
+from flask import Flask, render_template, redirect, request, flash
 from werkzeug.utils import secure_filename
 import Text
 
@@ -39,9 +39,8 @@ def index():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            a = Text.get_text(f'C:\\Users\\georg\\PycharmProjects\\Flask\\templates\\Images\\{filename}')
-            print(a)
-            return redirect(url_for('about', name=filename))
+            image_text = Text.get_text(f'{UPLOAD_FOLDER}\\{filename}')
+            return render_template('result.html', result=image_text)
         return redirect("/faq")
     else:
         return render_template("index.html")

@@ -39,7 +39,10 @@ def index():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image_text = Text.get_text(f'{UPLOAD_FOLDER}\\{filename}')
+            if request.form['button'] == '0':
+                image_text = Text.get_text(f'{UPLOAD_FOLDER}\\{filename}', 'rus')
+            else:
+                image_text = Text.get_text(f'{UPLOAD_FOLDER}\\{filename}')
             return render_template('result.html', result=image_text)
         return redirect("/faq")
     else:
